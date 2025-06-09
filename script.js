@@ -76,23 +76,28 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCloud(words);
   });
 
-  // Always show reset button
-  const resetBtn = document.createElement("button");
-  resetBtn.textContent = "Reset Word Cloud";
-  resetBtn.style.marginTop = "1rem";
-  resetBtn.style.backgroundColor = "#ff4d4d";
-  resetBtn.style.color = "#fff";
-  resetBtn.style.border = "none";
-  resetBtn.style.padding = "0.5rem 1rem";
-  resetBtn.style.borderRadius = "8px";
-  resetBtn.style.cursor = "pointer";
+  // Only show reset button if ?code=532579 is in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAdmin = urlParams.get("code") === "532579";
 
-  resetBtn.addEventListener("click", async () => {
-    const confirmReset = confirm("Are you sure you want to reset the word cloud?");
-    if (confirmReset) {
-      await set(wordsRef, {}); // Clear all words
-    }
-  });
+  if (isAdmin) {
+    const resetBtn = document.createElement("button");
+    resetBtn.textContent = "Reset Word Cloud";
+    resetBtn.style.marginTop = "1rem";
+    resetBtn.style.backgroundColor = "#ff4d4d";
+    resetBtn.style.color = "#fff";
+    resetBtn.style.border = "none";
+    resetBtn.style.padding = "0.5rem 1rem";
+    resetBtn.style.borderRadius = "8px";
+    resetBtn.style.cursor = "pointer";
 
-  document.querySelector(".container").appendChild(resetBtn);
+    resetBtn.addEventListener("click", async () => {
+      const confirmReset = confirm("Are you sure you want to reset the word cloud?");
+      if (confirmReset) {
+        await set(wordsRef, {}); // Clear all words
+      }
+    });
+
+    document.querySelector(".container").appendChild(resetBtn);
+  }
 });
