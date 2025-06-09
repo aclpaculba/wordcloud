@@ -1,4 +1,3 @@
-// Firebase SDK imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
 import {
   getDatabase,
@@ -72,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCloud(words);
   });
 
-  // Password-protected reset button
+  // ✅ Password-protected reset button
   const resetBtn = document.createElement("button");
   resetBtn.textContent = "Reset Word Cloud";
   resetBtn.style.marginTop = "1rem";
@@ -85,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   resetBtn.addEventListener("click", async () => {
     const password = prompt("Enter admin password to reset:");
-    if (password === "532579") {
+    if (password === "banana42") {
       const confirmReset = confirm("Are you sure you want to reset the word cloud?");
       if (confirmReset) {
         await set(wordsRef, {});
@@ -96,5 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.querySelector(".container").appendChild(resetBtn);
+  const container = document.querySelector(".container");
+  if (container) {
+    container.appendChild(resetBtn);
+  } else {
+    console.warn("Reset button failed: .container not found.");
+  }
 });
