@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const wordInput = document.getElementById("wordInput");
   const addWordBtn = document.getElementById("addWordBtn");
   const wordCanvas = document.getElementById("wordCanvas");
+  const inputGroup = document.querySelector(".input-group");
 
   // Add word function
   async function addWord() {
@@ -71,10 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCloud(words);
   });
 
-  // ✅ Password-protected reset button
+  //Password-protected reset button
   const resetBtn = document.createElement("button");
-  resetBtn.textContent = "Reset Word Cloud";
-  resetBtn.style.marginTop = "1rem";
+  resetBtn.textContent = "Reset";
   resetBtn.style.backgroundColor = "#ff4d4d";
   resetBtn.style.color = "#fff";
   resetBtn.style.border = "none";
@@ -95,10 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const container = document.querySelector(".container");
-  if (container) {
-    container.appendChild(resetBtn);
+  if (inputGroup) {
+    inputGroup.appendChild(resetBtn);
   } else {
-    console.warn("Reset button failed: .container not found.");
+    console.warn("Input group not found — can't place reset button.");
   }
 });
