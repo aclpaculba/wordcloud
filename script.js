@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const wordCanvas = document.getElementById("wordCanvas");
   const inputGroup = document.querySelector(".input-group");
 
-  // Add word function
+  // Add word
   async function addWord() {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") addWord();
   });
 
-  // Render cloud
+  // Render word cloud
   function renderCloud(words) {
     const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
     const list = entries.map(([word, count]) => [word, count]);
@@ -72,10 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCloud(words);
   });
 
-  //Password-protected reset button
+  // NEW Reset Button (no password)
   const resetBtn = document.createElement("button");
   resetBtn.textContent = "Reset";
-  resetBtn.style.backgroundColor = "#ff4d4d";
+  resetBtn.style.backgroundColor = "#aaa";
   resetBtn.style.color = "#fff";
   resetBtn.style.border = "none";
   resetBtn.style.padding = "0.5rem 1rem";
@@ -83,21 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
   resetBtn.style.cursor = "pointer";
 
   resetBtn.addEventListener("click", async () => {
-    const password = prompt("Enter admin password to reset:");
-    if (password === "banana42") {
-      const confirmReset = confirm("Are you sure you want to reset the word cloud?");
-      if (confirmReset) {
-        await set(wordsRef, {});
-        alert("Word cloud has been reset.");
-      }
-    } else {
-      alert("Incorrect password. Reset canceled.");
-    }
+    await set(wordsRef, {});
+    alert("Word cloud has been reset.");
   });
 
   if (inputGroup) {
     inputGroup.appendChild(resetBtn);
-  } else {
-    console.warn("Input group not found — can't place reset button.");
   }
 });
