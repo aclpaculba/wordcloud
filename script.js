@@ -1,4 +1,4 @@
-// Firebase SDK imports (non-module-compatible version)
+// Firebase SDK imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
 import {
   getDatabase,
@@ -6,7 +6,7 @@ import {
   onValue,
   set,
   get,
-  child,
+  child
 } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
 
 // Firebase config
@@ -24,9 +24,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wordsRef = ref(db, 'words');
-
-// Check for admin via new simpler code: ?admin=1
-const isAdmin = new URLSearchParams(location.search).get("admin") === "1";
 
 document.addEventListener("DOMContentLoaded", () => {
   const wordInput = document.getElementById("wordInput");
@@ -74,26 +71,4 @@ document.addEventListener("DOMContentLoaded", () => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
-
-  // Admin Reset Button
-  if (isAdmin) {
-    const resetBtn = document.createElement("button");
-    resetBtn.textContent = "Reset Word Cloud";
-    resetBtn.style.marginTop = "1rem";
-    resetBtn.style.backgroundColor = "#ff4d4d";
-    resetBtn.style.color = "#fff";
-    resetBtn.style.border = "none";
-    resetBtn.style.padding = "0.5rem 1rem";
-    resetBtn.style.borderRadius = "8px";
-    resetBtn.style.cursor = "pointer";
-
-    resetBtn.addEventListener("click", async () => {
-      const confirmReset = confirm("Are you sure you want to reset the word cloud?");
-      if (confirmReset) {
-        await set(wordsRef, {});
-      }
-    });
-
-    document.querySelector(".container").appendChild(resetBtn);
-  }
 });
