@@ -19,42 +19,54 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wordsRef = ref(db, 'words');
 
-// DOM elements
-const wordInput = document.getElementById("wordInput");
-const addWordBtn = document.getElementById("addWordBtn");
-const wordCanvas = document.getElementById("wordCanvas");
+document.addEventListener("DOMContentLoaded", () => {
+  const wordInput = document.getElementById("wordInput");
+  const addWordBtn = document.getElementById("addWordBtn");
+  const wordCanvas = document.getElementById("wordCanvas");
 
-// Add word or increment count
-addWordBtn.addEventListener("click", async () => {
-  const word = wordInput.value.trim().toLowerCase();
-  if (!word) return;
+  // Add word or increment count
+  addWordBtn.addEventListener("click", async () => {
+    const word = wordInput.value.trim().toLowerCase();
+    if (!word) return;
 
-  const snapshot = await get(child(ref(db), `words/${word}`));
-  const newCount = (snapshot.exists() ? snapshot.val() : 0) + 1;
+    const snapshot = await get(child(ref(db), `words/${word}`));
+    const newCount = (snapshot.exists() ? snapshot.val() : 0) + 1;
 
-  await set(ref(db, `words/${word}`), newCount);
-  wordInput.value = "";
-});
-
-// Render using WordCloud2.js
-function renderCloud(words) {
-  const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
-  const list = entries.map(([word, count]) => [word, count]);
-
-  WordCloud(wordCanvas, {
-    list: list,
-    gridSize: 8,
-    weightFactor: 10,
-    fontFamily: 'Arial',
-    color: 'random-dark',
-    rotateRatio: 0.5,
-    rotationSteps: 2,
-    backgroundColor: '#f9f9f9'
+    await set(ref(db, `words/${word}`), newCount);
+    wordInput.value = "";
   });
-}
 
-// Listen for DB changes
-onValue(wordsRef, (snapshot) => {
-  const words = snapshot.val() || {};
-  renderCloud(words);
+  // Enable Enter key submission
+  wordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      addWordBtn.click();
+    }
+  });
+
+  // Render using WordCloud2.js
+  function renderCloud(words) {
+    const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
+    const list = entries.map(([word, count]) => [word, count]);
+
+    WordCloud(wordCanvas, {
+      list: list,
+      gridSize: 8,
+      weightFactor: 10,
+      fontFamily: 'Arial',
+      color: function () {
+        // Example palette of blue shades
+        const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#87CEFA'];
+        return palette[Math.floor(Math.random() * palette.length)];
+      },
+      rotateRatio: 0.5,
+      rotationSteps: 2,
+      backgroundColor: '#f9f9f9'
+    });
+  }
+
+  // Listen for DB changes
+  onValue(wordsRef, (snapshot) => {
+    const words = snapshot.val() || {};
+    renderCloud(words);
+  });
 });
