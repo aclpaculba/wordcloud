@@ -1,4 +1,25 @@
-// Check if user is admin from URL
+// Firebase SDK imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyA7xyZ6pBpWPrTrzBWdR5M9POW_BODhqEQ",
+  authDomain: "wordcloud-686da.firebaseapp.com",
+  databaseURL: "https://wordcloud-686da-default-rtdb.firebaseio.com",
+  projectId: "wordcloud-686da",
+  storageBucket: "wordcloud-686da.appspot.com",
+  messagingSenderId: "875887427422",
+  appId: "1:875887427422:web:0afa9ee3e7a3815be619cf",
+  measurementId: "G-KWF8CYKSBH"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const wordsRef = ref(db, 'words');
+
+// Check admin code from URL
 const urlParams = new URLSearchParams(window.location.search);
 const isAdmin = urlParams.get("code") === "532579";
 
@@ -7,8 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const addWordBtn = document.getElementById("addWordBtn");
   const wordCanvas = document.getElementById("wordCanvas");
 
-  // Add word or increment count
-  addWordBtn.addEventListener("click", async () => {
+  // Add word (click or enter)
+  async function addWord() {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
 
@@ -17,21 +38,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     await set(ref(db, `words/${word}`), newCount);
     wordInput.value = "";
-  });
+  }
 
-  wordInput.addEventListener("keydown", async (event) => {
-    if (event.key === "Enter") {
-      const word = wordInput.value.trim().toLowerCase();
-      if (!word) return;
-
-      const snapshot = await get(child(ref(db), `words/${word}`));
-      const newCount = (snapshot.exists() ? snapshot.val() : 0) + 1;
-
-      await set(ref(db, `words/${word}`), newCount);
-      wordInput.value = "";
+  addWordBtn.addEventListener("click", addWord);
+  wordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      addWord();
     }
   });
 
+  // Render cloud
   function renderCloud(words) {
     const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
     const list = entries.map(([word, count]) => [word, count]);
@@ -41,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
       gridSize: 8,
       weightFactor: 10,
       fontFamily: 'Arial',
-      color: function () {
+      color: () => {
         const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#87CEFA'];
         return palette[Math.floor(Math.random() * palette.length)];
       },
@@ -51,12 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Sync from Firebase
   onValue(wordsRef, (snapshot) => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
 
-  // Show reset button only if admin
+  // Admin Reset Button (if ?code=532579)
   if (isAdmin) {
     const resetBtn = document.createElement("button");
     resetBtn.textContent = "Reset Word Cloud";
@@ -71,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resetBtn.addEventListener("click", async () => {
       const confirmReset = confirm("Are you sure you want to reset the word cloud?");
       if (confirmReset) {
-        await set(wordsRef, {}); // Clear all words
+        await set(wordsRef, {});
       }
     });
 
