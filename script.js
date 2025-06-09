@@ -1,30 +1,13 @@
-// Firebase SDK imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
-
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyA7xyZ6pBpWPrTrzBWdR5M9POW_BODhqEQ",
-  authDomain: "wordcloud-686da.firebaseapp.com",
-  databaseURL: "https://wordcloud-686da-default-rtdb.firebaseio.com",
-  projectId: "wordcloud-686da",
-  storageBucket: "wordcloud-686da.appspot.com",
-  messagingSenderId: "875887427422",
-  appId: "1:875887427422:web:0afa9ee3e7a3815be619cf",
-  measurementId: "G-KWF8CYKSBH"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const wordsRef = ref(db, 'words');
+// Check if user is admin from URL
+const urlParams = new URLSearchParams(window.location.search);
+const isAdmin = urlParams.get("code") === "532579";
 
 document.addEventListener("DOMContentLoaded", () => {
   const wordInput = document.getElementById("wordInput");
   const addWordBtn = document.getElementById("addWordBtn");
   const wordCanvas = document.getElementById("wordCanvas");
 
-  // Add word or increment count (button)
+  // Add word or increment count
   addWordBtn.addEventListener("click", async () => {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
@@ -36,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     wordInput.value = "";
   });
 
-  // Submit on Enter key
   wordInput.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
       const word = wordInput.value.trim().toLowerCase();
@@ -50,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Render Word Cloud
   function renderCloud(words) {
     const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
     const list = entries.map(([word, count]) => [word, count]);
@@ -70,16 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Update word cloud on DB changes
   onValue(wordsRef, (snapshot) => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
 
-  // Only show reset button if ?code=532579 is in the URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const isAdmin = urlParams.get("code") === "532579";
-
+  // Show reset button only if admin
   if (isAdmin) {
     const resetBtn = document.createElement("button");
     resetBtn.textContent = "Reset Word Cloud";
