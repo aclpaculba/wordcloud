@@ -72,15 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCloud(words);
   });
 
-  // NEW Reset Button (no password)
+  // ✅ Clean Reset button
   const resetBtn = document.createElement("button");
   resetBtn.textContent = "Reset";
   resetBtn.style.backgroundColor = "#aaa";
-  resetBtn.style.color = "#fff";
-  resetBtn.style.border = "none";
-  resetBtn.style.padding = "0.5rem 1rem";
-  resetBtn.style.borderRadius = "8px";
-  resetBtn.style.cursor = "pointer";
 
   resetBtn.addEventListener("click", async () => {
     await set(wordsRef, {});

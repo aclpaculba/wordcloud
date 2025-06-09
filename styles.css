@@ -1,6 +1,7 @@
 body {
   font-family: sans-serif;
   background: #f9f9f9;
+  margin: 0;
   padding: 2rem;
   text-align: center;
 }
@@ -16,15 +17,17 @@ body {
 
 .input-group {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
 
 input[type="text"] {
-  flex: 1;
   padding: 0.5rem;
   font-size: 1rem;
+  flex: 1 1 200px;
+  min-width: 0;
   max-width: 300px;
 }
 
@@ -32,10 +35,33 @@ button {
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
+  border-radius: 8px;
+  border: none;
+  background-color: #1E90FF;
+  color: white;
 }
 
 canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
   margin-top: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
+}
+
+/* Responsive tweaks for small screens */
+@media (max-width: 480px) {
+  body {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+
+  input[type="text"],
+  button {
+    flex: 1 1 100%;
+  }
 }
