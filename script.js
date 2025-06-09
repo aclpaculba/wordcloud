@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addWordBtn = document.getElementById("addWordBtn");
   const wordCanvas = document.getElementById("wordCanvas");
 
-  // Add word or increment count
+  // Add word or increment count (for button)
   addWordBtn.addEventListener("click", async () => {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
@@ -36,10 +36,17 @@ document.addEventListener("DOMContentLoaded", () => {
     wordInput.value = "";
   });
 
-  // Enable Enter key submission
-  wordInput.addEventListener("keydown", (event) => {
+  // Submit on Enter key directly (no need to click button)
+  wordInput.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
-      addWordBtn.click();
+      const word = wordInput.value.trim().toLowerCase();
+      if (!word) return;
+
+      const snapshot = await get(child(ref(db), `words/${word}`));
+      const newCount = (snapshot.exists() ? snapshot.val() : 0) + 1;
+
+      await set(ref(db, `words/${word}`), newCount);
+      wordInput.value = "";
     }
   });
 
@@ -54,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
       weightFactor: 10,
       fontFamily: 'Arial',
       color: function () {
-        // Example palette of blue shades
+        // Fixed color palette (blue shades)
         const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#87CEFA'];
         return palette[Math.floor(Math.random() * palette.length)];
       },
