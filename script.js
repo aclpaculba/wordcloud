@@ -1,6 +1,13 @@
-// Firebase SDK imports
+// Firebase SDK imports (non-module-compatible version)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  get,
+  child,
+} from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -14,21 +21,19 @@ const firebaseConfig = {
   measurementId: "G-KWF8CYKSBH"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wordsRef = ref(db, 'words');
 
-// Check admin code from URL
-const urlParams = new URLSearchParams(window.location.search);
-const isAdmin = urlParams.get("code") === "532579";
+// Check for admin via new simpler code: ?admin=1
+const isAdmin = new URLSearchParams(location.search).get("admin") === "1";
 
 document.addEventListener("DOMContentLoaded", () => {
   const wordInput = document.getElementById("wordInput");
   const addWordBtn = document.getElementById("addWordBtn");
   const wordCanvas = document.getElementById("wordCanvas");
 
-  // Add word (click or enter)
+  // Add word function
   async function addWord() {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
@@ -42,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   addWordBtn.addEventListener("click", addWord);
   wordInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      addWord();
-    }
+    if (e.key === "Enter") addWord();
   });
 
   // Render cloud
@@ -67,13 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Sync from Firebase
   onValue(wordsRef, (snapshot) => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
 
-  // Admin Reset Button (if ?code=532579)
+  // Admin Reset Button
   if (isAdmin) {
     const resetBtn = document.createElement("button");
     resetBtn.textContent = "Reset Word Cloud";
