@@ -71,4 +71,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
+
+  // Password-protected reset button
+  const resetBtn = document.createElement("button");
+  resetBtn.textContent = "Reset Word Cloud";
+  resetBtn.style.marginTop = "1rem";
+  resetBtn.style.backgroundColor = "#ff4d4d";
+  resetBtn.style.color = "#fff";
+  resetBtn.style.border = "none";
+  resetBtn.style.padding = "0.5rem 1rem";
+  resetBtn.style.borderRadius = "8px";
+  resetBtn.style.cursor = "pointer";
+
+  resetBtn.addEventListener("click", async () => {
+    const password = prompt("Enter admin password to reset:");
+    if (password === "532579") {
+      const confirmReset = confirm("Are you sure you want to reset the word cloud?");
+      if (confirmReset) {
+        await set(wordsRef, {});
+        alert("Word cloud has been reset.");
+      }
+    } else {
+      alert("Incorrect password. Reset canceled.");
+    }
+  });
+
+  document.querySelector(".container").appendChild(resetBtn);
 });
