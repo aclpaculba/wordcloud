@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addWordBtn = document.getElementById("addWordBtn");
   const wordCanvas = document.getElementById("wordCanvas");
 
-  // Add word or increment count (for button)
+  // Add word or increment count (button)
   addWordBtn.addEventListener("click", async () => {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wordInput.value = "";
   });
 
-  // Submit on Enter key directly (no need to click button)
+  // Submit on Enter key
   wordInput.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
       const word = wordInput.value.trim().toLowerCase();
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Render using WordCloud2.js
+  // Render Word Cloud
   function renderCloud(words) {
     const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
     const list = entries.map(([word, count]) => [word, count]);
@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
       weightFactor: 10,
       fontFamily: 'Arial',
       color: function () {
-        // Fixed color palette (blue shades)
         const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#87CEFA'];
         return palette[Math.floor(Math.random() * palette.length)];
       },
@@ -71,9 +70,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Listen for DB changes
+  // Update word cloud on DB changes
   onValue(wordsRef, (snapshot) => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
+
+  // Show reset button only for admin
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAdmin = urlParams.get("code") === "532579";
+
+  if (isAdmin) {
+    const resetBtn = document.createElement("button");
+    resetBtn.textContent = "Reset Word Cloud";
+    resetBtn.style.marginTop = "1rem";
+    resetBtn.style.backgroundColor = "#ff4d4d";
+    resetBtn.style.color = "#fff";
+    resetBtn.style.border = "none";
+    resetBtn.style.padding = "0.5rem 1rem";
+    resetBtn.style.borderRadius = "8px";
+    resetBtn.style.cursor = "pointer";
+
+    resetBtn.addEventListener("click", async () => {
+      const confirmReset = confirm("Are you sure you want to reset the word cloud?");
+      if (confirmReset) {
+        await set(wordsRef, {}); // Clear all words
+      }
+    });
+
+    document.querySelector(".container").appendChild(resetBtn);
+  }
 });
