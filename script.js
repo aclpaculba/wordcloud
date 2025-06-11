@@ -26,7 +26,6 @@ const wordsRef = ref(db, 'words');
 
 const bannedWords = [
   "badword1", "badword2", "nastyword", "slur", "offensiveword"
-  // Add more banned words as needed, all lowercase
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -35,20 +34,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetBtn = document.getElementById("resetBtn");
   const wordCanvas = document.getElementById("wordCanvas");
 
-  // Fix blurry canvas by scaling for device pixel ratio
-  const dpr = window.devicePixelRatio || 1;
-  const canvasWidth = wordCanvas.clientWidth;
-  const canvasHeight = Math.floor(window.innerHeight * 0.5);
+  // Resize canvas to fit remaining space
+  function fitCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const formHeight = document.querySelector(".input-group").offsetHeight;
+    const containerPadding = 32; // Top + bottom padding
+    const availableHeight = window.innerHeight - formHeight - containerPadding - 100;
 
-  wordCanvas.width = canvasWidth * dpr;
-  wordCanvas.height = canvasHeight * dpr;
-  wordCanvas.style.width = `${canvasWidth}px`;
-  wordCanvas.style.height = `${canvasHeight}px`;
+    wordCanvas.width = wordCanvas.clientWidth * dpr;
+    wordCanvas.height = availableHeight * dpr;
+    wordCanvas.style.height = `${availableHeight}px`;
 
-  const ctx = wordCanvas.getContext("2d");
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const ctx = wordCanvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
 
-  // Add word
+  window.addEventListener("resize", fitCanvas);
+  fitCanvas();
+
   async function addWord() {
     const word = wordInput.value.trim().toLowerCase();
     if (!word) return;
@@ -76,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Word cloud has been reset.");
   });
 
-  // Render word cloud
   function renderCloud(words) {
     const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
     const list = entries.map(([word, count]) => [word, count]);
