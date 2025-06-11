@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const wordInput = document.getElementById("wordInput");
   const addWordBtn = document.getElementById("addWordBtn");
   const resetBtn = document.getElementById("resetBtn");
-  const wordCanvas = document.getElementById("wordCanvas");
+  const wordCloud = document.getElementById("wordCloud");
 
   async function addWord() {
     const word = wordInput.value.trim().toLowerCase();
@@ -62,24 +62,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function renderCloud(words) {
-    const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
-    const list = entries.map(([word, count]) => [word, count]);
+    wordCloud.innerHTML = "";
+    const containerWidth = wordCloud.clientWidth;
+    const containerHeight = wordCloud.clientHeight;
 
-    WordCloud(wordCanvas, {
-      list: list,
-      gridSize: Math.floor(16 * window.innerWidth / 1024),
-      weightFactor: (size) => size * 5,
-      fontFamily: 'Arial',
-      color: () => {
-        const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#228B22', '#556B2F', '#8B4513'];
-        return palette[Math.floor(Math.random() * palette.length)];
-      },
-      rotateRatio: 0.3,
-      rotationSteps: 2,
-      backgroundColor: '#ffffff',
-      shuffle: true,
-      drawOutOfBound: false,
-      origin: [window.innerWidth / 2, window.innerHeight / 2]
+    Object.entries(words).forEach(([word, count]) => {
+      const size = 14 + count * 5;
+      const span = document.createElement("span");
+      span.textContent = word;
+      span.style.fontSize = `${size}px`;
+      span.style.left = `${Math.random() * (containerWidth - 100)}px`;
+      span.style.top = `${Math.random() * (containerHeight - 30)}px`;
+      span.style.transform = `rotate(${Math.floor(Math.random() * 30 - 15)}deg)`;
+      wordCloud.appendChild(span);
     });
   }
 
@@ -90,10 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("resize", () => {
     const words = {};
-    document.querySelectorAll("canvas")[0].getContext("2d").clearRect(0, 0, wordCanvas.width, wordCanvas.height);
-    onValue(wordsRef, (snapshot) => {
-      const w = snapshot.val() || {};
-      renderCloud(w);
+    document.querySelectorAll("#wordCloud span").forEach((span) => {
+      const text = span.textContent;
+      const size = parseInt(span.style.fontSize);
+      const count = Math.round((size - 14) / 5);
+      words[text] = count;
     });
+    renderCloud(words);
   });
 });
