@@ -2,53 +2,41 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: sans-serif;
-  background: #f9f9f9;
+body, html {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  font-family: sans-serif;
+  background: white;
 }
 
 .container {
-  flex: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+  height: 100vh;
 }
 
-h1 {
-  margin: 1rem 0 0.5rem 0;
-  font-size: 2rem;
-  text-align: center;
-}
-
-.input-group {
+.top-bar {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  margin: 0.5rem 1rem;
+  padding: 1rem;
 }
 
 input[type="text"] {
   padding: 0.5rem;
-  font-size: 1.2rem;
-  flex: 1 1 300px;
+  font-size: 1.1rem;
+  flex: 1 1 250px;
   max-width: 400px;
-  border: none;
-  outline: none;
   border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 button {
   padding: 0.5rem 1rem;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   cursor: pointer;
   border-radius: 8px;
   border: none;
@@ -57,40 +45,14 @@ button {
 }
 
 #resetBtn {
-  background-color: #aaa;
+  background-color: #999;
 }
 
-#wordCloud {
-  position: relative;
+canvas {
   flex-grow: 1;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  display: block;
   margin: 0;
   padding: 0;
-}
-
-#wordCloud span {
-  position: absolute;
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-  color: #1E90FF;
-  white-space: nowrap;
-  user-select: none;
-  pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .input-group {
-    flex-direction: column;
-    align-items: stretch;
-    margin: 0.5rem 1rem;
-  }
-
-  input[type="text"],
-  button {
-    flex: 1 1 auto;
-    width: 100%;
-    font-size: 1rem;
-  }
 }

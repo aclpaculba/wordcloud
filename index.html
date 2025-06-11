@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Collaborative Word Cloud</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.1.0/src/wordcloud2.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Collaborative Word Cloud</h1>
-    <div class="input-group">
+    <div class="top-bar">
       <input type="text" id="wordInput" placeholder="Enter a word" />
       <button id="addWordBtn">Add Word</button>
       <button id="resetBtn">Reset</button>
     </div>
-    <div id="wordCloud"></div>
+    <canvas id="wordCanvas"></canvas>
   </div>
   <script type="module" src="script.js"></script>
 </body>
