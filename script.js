@@ -36,12 +36,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function fitCanvas() {
     const dpr = window.devicePixelRatio || 1;
-    const formHeight = document.querySelector(".input-group").offsetHeight;
-    const containerPadding = 32;
-    const availableHeight = window.innerHeight - formHeight - containerPadding - 100;
 
-    wordCanvas.width = wordCanvas.clientWidth * dpr;
+    const topOffset = document.querySelector(".input-group").offsetHeight + 80;
+    const availableHeight = window.innerHeight - topOffset;
+
+    const canvasWidth = wordCanvas.clientWidth;
+
+    wordCanvas.width = canvasWidth * dpr;
     wordCanvas.height = availableHeight * dpr;
+    wordCanvas.style.width = `${canvasWidth}px`;
     wordCanvas.style.height = `${availableHeight}px`;
 
     const ctx = wordCanvas.getContext("2d");
@@ -85,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     WordCloud(wordCanvas, {
       list: list,
       gridSize: 8,
-      weightFactor: 15, // Larger font
+      weightFactor: 15,
       fontFamily: 'Arial',
       color: () => {
         const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#87CEFA'];
