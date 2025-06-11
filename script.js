@@ -27,8 +27,11 @@ const wordsRef = ref(db, 'words');
 document.addEventListener("DOMContentLoaded", () => {
   const wordInput = document.getElementById("wordInput");
   const addWordBtn = document.getElementById("addWordBtn");
+  const resetBtn = document.getElementById("resetBtn");
   const wordCanvas = document.getElementById("wordCanvas");
-  const inputGroup = document.querySelector(".input-group");
+
+  // Dynamically set canvas height to fill half the screen
+  wordCanvas.height = Math.floor(window.innerHeight * 0.5);
 
   // Add word
   async function addWord() {
@@ -45,6 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
   addWordBtn.addEventListener("click", addWord);
   wordInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") addWord();
+  });
+
+  // Reset button logic
+  resetBtn.addEventListener("click", async () => {
+    await set(wordsRef, {});
+    alert("Word cloud has been reset.");
   });
 
   // Render word cloud
@@ -71,18 +80,4 @@ document.addEventListener("DOMContentLoaded", () => {
     const words = snapshot.val() || {};
     renderCloud(words);
   });
-
-  // ✅ Clean Reset button
-  const resetBtn = document.createElement("button");
-  resetBtn.textContent = "Reset";
-  resetBtn.style.backgroundColor = "#aaa";
-
-  resetBtn.addEventListener("click", async () => {
-    await set(wordsRef, {});
-    alert("Word cloud has been reset.");
-  });
-
-  if (inputGroup) {
-    inputGroup.appendChild(resetBtn);
-  }
 });
