@@ -1,107 +1,77 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set,
-  get,
-  child
-} from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
+const input = document.getElementById("word-input");
+const resetBtn = document.getElementById("reset-btn");
+const wordList = document.getElementById("word-list");
+const canvas = document.getElementById("word-cloud");
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyA7xyZ6pBpWPrTrzBWdR5M9POW_BODhqEQ",
-  authDomain: "wordcloud-686da.firebaseapp.com",
-  databaseURL: "https://wordcloud-686da-default-rtdb.firebaseio.com",
-  projectId: "wordcloud-686da",
-  storageBucket: "wordcloud-686da.appspot.com",
-  messagingSenderId: "875887427422",
-  appId: "1:875887427422:web:0afa9ee3e7a3815be619cf",
-  measurementId: "G-KWF8CYKSBH"
-};
+let wordsMap = {};
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const wordsRef = ref(db, 'words');
+// Fix canvas for high-DPI displays
+function resizeCanvasForHDPI(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
 
-const bannedWords = [
-  "badword1", "badword2", "nastyword", "slur", "offensiveword"
-];
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = `${rect.width}px`;
+  canvas.style.height = `${rect.height}px`;
 
-document.addEventListener("DOMContentLoaded", () => {
-  const wordInput = document.getElementById("wordInput");
-  const addWordBtn = document.getElementById("addWordBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const wordCanvas = document.getElementById("wordCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
 
-  function fitCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-
-    const topOffset = document.querySelector(".input-group").offsetHeight + 80;
-    const availableHeight = window.innerHeight - topOffset;
-
-    const canvasWidth = wordCanvas.clientWidth;
-
-    wordCanvas.width = canvasWidth * dpr;
-    wordCanvas.height = availableHeight * dpr;
-    wordCanvas.style.width = `${canvasWidth}px`;
-    wordCanvas.style.height = `${availableHeight}px`;
-
-    const ctx = wordCanvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+// Sort by frequency descending and update sidebar
+function updateWordList() {
+  wordList.innerHTML = "";
+  const sortedEntries = Object.entries(wordsMap).sort((a, b) => b[1] - a[1]);
+  for (const [word, count] of sortedEntries) {
+    const li = document.createElement("li");
+    li.textContent = `${word} (${count})`;
+    wordList.appendChild(li);
   }
+}
 
-  window.addEventListener("resize", fitCanvas);
-  fitCanvas();
+function getWordCloudList() {
+  return Object.entries(wordsMap).map(([word, count]) => [word, count]);
+}
 
-  async function addWord() {
-    const word = wordInput.value.trim().toLowerCase();
-    if (!word) return;
+function drawCloud() {
+  resizeCanvasForHDPI(canvas);
+  WordCloud(canvas, {
+    list: getWordCloudList(),
+    gridSize: 8,
+    weightFactor: function (size) {
+      return 10 + size * 5;
+    },
+    rotateRatio: 0.5,
+    rotationSteps: 2,
+    backgroundColor: "#ffffff",
+    color: function () {
+      const hue = Math.floor(Math.random() * 360);
+      const saturation = 60 + Math.random() * 40;
+      const lightness = 40 + Math.random() * 20;
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    },
+    fontFamily: "Arial, sans-serif"
+  });
+}
 
-    if (bannedWords.includes(word)) {
-      alert("That word is not allowed.");
-      wordInput.value = "";
-      return;
+
+
+input.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    const word = input.value.trim().toLowerCase();
+    if (word) {
+      wordsMap[word] = (wordsMap[word] || 0) + 1;
+      updateWordList();
+      drawCloud();
     }
-
-    const snapshot = await get(child(ref(db), `words/${word}`));
-    const newCount = (snapshot.exists() ? snapshot.val() : 0) + 1;
-
-    await set(ref(db, `words/${word}`), newCount);
-    wordInput.value = "";
+    input.value = "";
   }
+});
 
-  addWordBtn.addEventListener("click", addWord);
-  wordInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") addWord();
-  });
-
-  resetBtn.addEventListener("click", async () => {
-    await set(wordsRef, {});
-    alert("Word cloud has been reset.");
-  });
-
-  function renderCloud(words) {
-    const entries = Object.entries(words).sort((a, b) => b[1] - a[1]);
-    const list = entries.map(([word, count]) => [word, count]);
-
-    WordCloud(wordCanvas, {
-      list: list,
-      gridSize: 8,
-      weightFactor: 15,
-      fontFamily: 'Arial',
-      color: () => {
-        const palette = ['#1E90FF', '#00BFFF', '#4682B4', '#5F9EA0', '#87CEFA'];
-        return palette[Math.floor(Math.random() * palette.length)];
-      },
-      rotateRatio: 0.5,
-      rotationSteps: 2,
-      backgroundColor: '#f9f9f9'
-    });
-  }
-
-  onValue(wordsRef, (snapshot) => {
-    const words = snapshot.val() || {};
-    renderCloud(words);
-  });
+resetBtn.addEventListener("click", function () {
+  wordsMap = {};
+  wordList.innerHTML = "";
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
